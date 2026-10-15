@@ -1,0 +1,80 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aisecurity-test"
+version = "1.0.0"
+description = "AI Security Test - A lightweight OWASP LLM Top10 (2025) red-team payload toolkit with 40 curated cases and 13 CLI commands"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [{name = "terry tian"}]
+keywords = [
+    "ai-security",
+    "llm",
+    "red-team",
+    "owasp",
+    "prompt-injection",
+    "mcp",
+    "jailbreak",
+    "ai-agent",
+    "penetration-testing",
+    "llm-security",
+    "security-testing",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Security",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+full = [
+    "pillow>=10.0.0",
+    "python-docx>=1.1.0",
+    "openpyxl>=3.1.0",
+    "reportlab>=4.0.0",
+    "deep-translator>=1.11.0",
+]
+dev = [
+    "pytest>=7",
+    "pytest-cov",
+    "ruff",
+    "python-docx>=1.1.0",
+    "openpyxl>=3.1.0",
+]
+
+[project.scripts]
+aisec = "aisecurity.cli.main:main"
+
+[project.urls]
+Homepage = "https://github.com/milantgh/AISecurityTest"
+Repository = "https://github.com/milantgh/AISecurityTest"
+Issues = "https://github.com/milantgh/AISecurityTest/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+aisecurity = ["data/cases/*.yaml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py38"

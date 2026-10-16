@@ -8,6 +8,7 @@ meta:
 cases:
   PI-029:
     id: "PI-029"
+    manual_only: true
     sub: "推理引擎/依赖组件"
     sub3: "未修复的推理引擎漏洞利用"
     pre: "目标系统使用已知版本的推理引擎（vLLM、TGI、Ollama）；可访问版本信息。"
@@ -24,6 +25,7 @@ cases:
 
   PI-030:
     id: "PI-030"
+    manual_only: true
     sub: "Agent 扩展组件"
     sub3: "恶意插件/MCP 服务器注入"
     pre: "AI Agent 集成了外部 MCP 服务器、插件或扩展组件；可获取 manifest。"

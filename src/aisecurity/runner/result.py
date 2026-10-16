@@ -11,6 +11,7 @@ class CaseResult:
     eval_results: List[Any] = field(default_factory=list)
     latency_ms: int = 0
     error: str = ""
+    meta: Dict[str, Any] = field(default_factory=dict)   # 新增：变体元信息
 
     @property
     def success(self):
@@ -25,5 +26,6 @@ class CaseResult:
             "latency_ms": self.latency_ms,
             "error": self.error,
             "success": self.success,
+            "meta": self.meta,
             "eval_results": [r.to_dict() for r in self.eval_results],
         }

@@ -8,6 +8,7 @@ meta:
 cases:
   PI-034:
     id: "PI-034"
+    manual_only: true
     sub: "多租户隔离"
     sub3: "跨命名空间/跨租户检索泄露"
     pre: "RAG 系统为多租户架构；向量数据库使用共享 collection 或共享 namespace。"
@@ -24,6 +25,7 @@ cases:
 
   PI-035:
     id: "PI-035"
+    manual_only: true
     sub: "知识库投毒"
     sub3: "嵌入空间对抗性文档主导检索"
     pre: "可向测试向量库写入文档；RAG 系统允许用户提交或第三方文档进入知识库。"

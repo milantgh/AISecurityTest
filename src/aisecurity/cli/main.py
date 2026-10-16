@@ -28,12 +28,14 @@ from .cmd_compose import add_compose_parser, handle_compose
 from .cmd_transform import add_transform_parser, handle_transform
 from .cmd_rewrite import add_rewrite_parser, handle_rewrite
 from .cmd_pipeline import add_pipeline_parser, handle_pipeline
+from .cmd_multimodal import add_multimodal_parser, handle_multimodal
+from .cmd_autoscan import add_autoscan_parser, handle_autoscan   # 新增
 
 
 def build_parser():
     p = argparse.ArgumentParser(
         prog="aisec",
-        description="AISecurityTest - AI Security Test System (v1.0)")
+        description="AISecurityTest - AI Security Test System (v1.1)")
     p.add_argument("--version", action="store_true", help="show version")
     sub = p.add_subparsers(dest="cmd")
 
@@ -50,6 +52,8 @@ def build_parser():
     add_transform_parser(sub)
     add_rewrite_parser(sub)
     add_pipeline_parser(sub)
+    add_multimodal_parser(sub)
+    add_autoscan_parser(sub)   # 新增
     return p
 
 
@@ -80,6 +84,8 @@ def main(argv=None):
         "transform": handle_transform,
         "rewrite": handle_rewrite,
         "pipeline": handle_pipeline,
+        "multimodal": handle_multimodal,
+        "autoscan": handle_autoscan,   # 新增
     }
     return handlers[args.cmd](args)
 

@@ -1,0 +1,29 @@
+name: text_only
+description: 纯文本注入用例（可通过 OpenAI 兼容 API 自动扫）
+rate_limit_sec: 0.5
+cases:
+  - PI-001
+  - PI-002
+  - PI-004
+  - PI-008
+  - PI-009
+  - PI-010
+  - PI-011
+  - PI-012
+  - PI-013
+  - PI-014
+  - PI-015
+  - PI-016
+  - PI-017
+  - PI-018
+  - PI-019
+  - PI-020
+  - PI-023
+  - PI-024
+  - PI-025
+  - PI-028
+  - PI-033
+  - PI-036
+  - PI-037
+  - PI-038
+  - PI-040

@@ -1,0 +1,14 @@
+name: quick
+description: 快速扫描（Top 10 用例）
+rate_limit_sec: 0.5
+cases:
+  - PI-001
+  - PI-002
+  - PI-004
+  - PI-008
+  - PI-014
+  - PI-016
+  - PI-019
+  - PI-020
+  - PI-021
+  - PI-030

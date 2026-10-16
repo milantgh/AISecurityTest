@@ -1,0 +1,5 @@
+name: stealth
+description: 隐蔽扫描（低速率，避免触发目标限流）
+rate_limit_sec: 3.0
+filter:
+  levels: ["严重", "高"]

@@ -1,0 +1,2 @@
+aisec autoscan run --endpoint https://api.deepseek.com --model deepseek-chat --api-key REMOVED --profile quick --format html -o report.html  --verbose
+aisec autoscan run --endpoint https://api.deepseek.com --model deepseek-chat --api-key REMOVED --profile quick --format json --output deepseek_report.json --verbose

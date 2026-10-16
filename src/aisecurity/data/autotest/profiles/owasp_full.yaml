@@ -1,0 +1,7 @@
+name: owasp_full
+description: OWASP LLM Top10 全量扫描
+rate_limit_sec: 0.5
+# 不写 cases，用 filter 直接选全部
+filter:
+  owasp: ["LLM01", "LLM02", "LLM03", "LLM04", "LLM05",
+          "LLM06", "LLM07", "LLM08", "LLM09", "LLM10"]

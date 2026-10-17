@@ -79,7 +79,7 @@ Issues = "https://github.com/milantgh/AISecurityTest/issues"
 where = ["src"]
 
 [tool.setuptools.package-data]
-aisecurity = ["data/cases/*.yaml"]
+aisecurity = ["data/cases/*.yaml", "data/datasets/*.csv", "data/datasets/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

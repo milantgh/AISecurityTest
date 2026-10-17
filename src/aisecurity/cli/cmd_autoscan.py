@@ -75,6 +75,10 @@ def add_autoscan_parser(sub):
     g.add_argument("--category", default=None, help="filter by category name")
     g.add_argument("--owasp", default=None, help="filter by OWASP ID")
     g.add_argument("--level", default=None, help="filter by risk level")
+    g.add_argument("--probes", default=None,
+                   help="run probes instead of (or in addition to) YAML cases, "
+                        "comma-separated probe names. Use 'all' to run every probe. "
+                        "List available probes with: aisec probes list")
 
     # Variant expansion
     g.add_argument("--transform", "-t", default=None,
@@ -95,7 +99,8 @@ def add_autoscan_parser(sub):
     g.add_argument("--rate", type=float, default=0.5,
                    help="minimum interval between requests in seconds")
     g.add_argument("--eval", default="marker,regex",
-                   help="evaluators, comma-separated (marker,regex,judge). "
+                   help="evaluators, comma-separated "
+                        "(marker,regex,judge,unicode_tags,multilingual). "
                         "The judge evaluator is only built when --judge-endpoint is also set.")
     g.add_argument("--stop-on-error", action="store_true",
                    help="stop immediately on the first error")

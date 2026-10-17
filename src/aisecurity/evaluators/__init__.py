@@ -4,10 +4,13 @@ from .base import Evaluator, EvalResult
 from .marker_eval import MarkerEvaluator
 from .regex_eval import RegexEvaluator
 from .judge_eval import JudgeEvaluator
+from .unicode_tags import UnicodeTagsEvaluator
+from .multilingual import MultilingualEvaluator
 
 __all__ = [
     "Evaluator", "EvalResult",
     "MarkerEvaluator", "RegexEvaluator", "JudgeEvaluator",
+    "UnicodeTagsEvaluator", "MultilingualEvaluator",
     "build_evaluators",
 ]
 
@@ -19,7 +22,8 @@ def build_evaluators(names, judge_config=None):
     ----------
     names : str | list[str]
         Comma-separated string or list. Accepted values:
-        "marker", "regex", "judge". Unknown names are ignored.
+        "marker", "regex", "judge", "unicode_tags", "multilingual".
+        Unknown names are ignored.
     judge_config : dict | None
         Optional kwargs for JudgeEvaluator, e.g.
             {"endpoint": "https://api.openai.com",
@@ -47,4 +51,8 @@ def build_evaluators(names, judge_config=None):
             # Only build the judge if the caller actually configured it.
             if judge_config and judge_config.get("endpoint"):
                 out.append(JudgeEvaluator(**judge_config))
+        elif n in ("unicode_tags", "unicode-tags", "ascii_smuggling"):
+            out.append(UnicodeTagsEvaluator())
+        elif n in ("multilingual", "multi_lang", "bilingual"):
+            out.append(MultilingualEvaluator())
     return out

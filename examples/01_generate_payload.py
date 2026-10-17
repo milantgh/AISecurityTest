@@ -28,7 +28,10 @@ def main():
     print("=" * 60)
     print("2. Three-layer composed payloads")
     print("=" * 60)
-    payload = PRESETS["回执标记"]
+    # PRESETS keys are "marker" / "leak_system_prompt" / "role_hijack".
+    # The old example used the Chinese label "回执标记", which is not a key
+    # and raises KeyError. Use "marker" instead.
+    payload = PRESETS["marker"]
     for i, p in enumerate(gen_three(3, payload), 1):
         print("[%d] %s" % (i, p))
         print()

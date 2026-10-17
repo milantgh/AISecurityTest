@@ -1,104 +1,144 @@
 # Contributing
 
-Thank you for wanting to contribute to AISecurityTest! There's only one thing
-you need to understand to contribute: writing test cases in YAML files.
+Thank you for wanting to contribute to AISecurityTest! There is one thing you need to understand to contribute: writing test cases in YAML.
+
+The case library is organized as **one directory per category, one `cases.yaml` per directory**. There are 8 categories today:
+
+```
+src/aisecurity/data/cases/
+├── direct/cases.yaml
+├── indirect/cases.yaml
+├── encoded/cases.yaml
+├── role_confusion/cases.yaml
+├── tool_misuse/cases.yaml
+├── data_exfiltration/cases.yaml
+├── multi_language/cases.yaml
+└── format_manipulation/cases.yaml
+```
 
 ## Three Ways to Contribute
 
-### 1. Add a Test Case (Easiest — Recommended for First-Time Contributors)
+### 1. Add a Test Case (Easiest - Recommended for First-Time Contributors)
+
+**You do NOT create a new file or a new directory for this.** You edit the `cases.yaml` of the directory that best matches your attack surface.
 
 Workflow:
 
-Step 1. Check existing category names (avoid duplicates):
-
-    aisec categories
-
-Step 2. Get the next available ID:
+Step 1. Get the next available case ID:
 
     aisec next-id
 
-Step 3. Check your category name is unique:
+Step 2. Pick a directory. See "Which directory?" below. If unsure, pick the closest one; the reviewer will move it if needed.
 
-    aisec check-name "My New Category"
+Step 3. Open `src/aisecurity/data/cases/<directory>/cases.yaml` and add a new entry under `cases:`. Copy the field layout from an existing case in the same file.
 
-Step 4. Look at `src/aisecurity/data/cases/_template.yaml`
+Step 4. Run `aisec validate` locally. You are good once you see "All cases validated".
 
-Step 5. Find the matching category file (e.g., `direct_injection.yaml`)
-
-Step 6. Add a new case under `cases:`, copying the fields from the template
-
-Step 7. Run `aisec validate` locally — you're good once you see
-        "✅ All cases validated"
-
-Step 8. Submit a PR
+Step 5. Submit a PR.
 
 Case ID Rules:
 
 - Format: `PI-XXX`, globally unique
-- Always use the next available ID — run `aisec next-id` to check
+- Always use the next available ID - run `aisec next-id`
 - Do NOT reserve ranges or skip numbers
 - Do NOT reuse IDs from existing cases
 
-Risk Level: Must be one of `严重` / `高` / `中-高` / `中` / `低`
-(Critical / High / Medium-High / Medium / Low)
+Risk Level: must be one of `严重` / `高` / `中-高` / `中` / `低`.
 
-### 2. Add a New Category
+#### Required field layout
 
-1. Run `aisec categories` to see existing category names
-2. Run `aisec next-id` to get the next available ID
-3. Run `aisec check-name "Your Name"` to confirm no conflict
-4. Copy `src/aisecurity/data/cases/_template.yaml` to `your_category_name.yaml`
-5. Fill in the `meta` section (`name` must be globally unique,
-   `order` controls the sidebar order)
-6. Add cases under `cases:`, using the ID from step 2
-7. Submit a PR once `aisec validate` passes
+Every case uses the same field order so contributors always see the same shape:
+
+```yaml
+  PI-XXX:
+    id: "PI-XXX"
+    sub: "second-level category"
+    sub3: "third-level category"
+    pre: "preconditions"
+    steps:
+      - "human-readable step 1"
+      - "human-readable step 2"
+    payloads:
+      - "the actual attack text sent to the model"
+    expect: "what a correctly defended model should do"
+    level: "高"
+    defense: "actionable defense"
+    owasp: "LLM01"
+    note: "additional notes"
+    source: "citation, or internal"
+    manual_only: false
+```
+
+| Field | Meaning |
+|---|---|
+| `id` | `PI-XXX`, global unique |
+| `sub` / `sub3` | second/third-level category |
+| `pre` | preconditions |
+| `steps` | **human-readable steps**, kept for readers. Not sent to the model |
+| `payloads` | **the real payloads**, sent to the model verbatim. If the step heuristic misjudges your `steps`, you MUST use this field |
+| `expect` | what a correctly defended model should do |
+| `level` | `严重` / `高` / `中-高` / `中` / `低` |
+| `defense` | actionable defense |
+| `owasp` | OWASP LLM ID |
+| `note` | additional notes |
+| `source` | citation, or `internal` |
+| `manual_only` | `true` if the case needs a human (file upload, browser, RAG); `false` if a plain API call can run it |
+
+#### `steps` vs `payloads`
+
+- `steps` is for humans. Write as much detail as you like.
+- `payloads` is for the runner. Put **only** the real attack text here.
+- If your `steps` contain lines that look like payloads but also contain human-readable prefixes (e.g. `场景1（...）：<im_start>...`), put the clean payload in `payloads` so the runner does not send the prefix.
+- If a case is `manual_only: true`, `payloads` may be empty.
+
+### 2. Add a New Category (Needs Discussion First)
+
+**Default answer: no.** The 8 categories are stable. Creating a new directory requires an Issue first.
+
+Only propose a new category when ALL of these hold:
+
+1. None of the existing 8 directories can hold your case
+2. The attack surface is backed by public research (paper, CVE, report)
+3. You plan to contribute at least 5 cases, not one
+
+Process:
+
+1. Open an Issue titled `[New category] <attack surface name>`
+2. Include: description, why the 8 existing directories are insufficient, citation, planned number of cases
+3. Wait for a maintainer. If approved, the maintainer creates the directory and an empty `cases.yaml`, then you add your cases
+4. PRs that create a new directory without a prior approved Issue will be closed
 
 ### 3. Add a Target Adapter (Requires Python)
 
-See `src/aisecurity/targets/openai_compat.py` and implement the `send()`
-method of the `Target` abstract class.
+See `src/aisecurity/targets/openai_compat.py` and implement the `send()` method of the `Target` abstract class.
 
 ---
 
-## Naming Convention
+## Which directory?
 
-Both the file name and the category name use the same suffix.
-
-| Suffix | Scenario | File name | Category name |
-|---|---|---|---|
-| (none) | Chinese default | `direct_injection.yaml` | `直接提示注入` |
-| `_en` | English | `direct_injection_en.yaml` | `直接提示注入 EN` |
-| `_ja` | Japanese | `direct_injection_ja.yaml` | `直接提示注入 JA` |
-| `_v2` | Content revision | `direct_injection_v2.yaml` | `直接提示注入 v2` |
-| `_financial` | Financial industry | `direct_injection_financial.yaml` | `直接提示注入（金融）` |
-| `_2025q4` | Time batch | `direct_injection_2025q4.yaml` | `直接提示注入 2025Q4` |
-
-Why: files with the same prefix are grouped together in the directory
-listing, and category names with the same prefix are grouped together
-in the sidebar. Users immediately recognize that they belong to the
-same logical category.
-
-Category names must be globally unique. If two files use the same
-`meta.name`, the second is rejected at load time. Example output:
-
-    $ aisec validate
-    ...
-    ⚠ 发现问题：
-      - [my_file.yaml] 分类名 '直接提示注入' 已被 direct_injection.yaml 占用，本文件跳过。
-        请改一个唯一的分类名（如 '直接提示注入 EN' / '直接提示注入 v2' / '直接提示注入（金融）'）。
-        跑 `aisec categories` 查看已有分类名。
-
-Fix it by renaming your category.
+```
+What does your case test?
+├─ Directly ask the model to ignore/override instructions  -> direct/
+├─ Injection via documents, web pages, emails, tool output -> indirect/
+├─ Encoding: Base64, zero-width, Leetspeak, Unicode Tags   -> encoded/
+├─ Roleplay, jailbreak persona, role confusion             -> role_confusion/
+├─ Tool misuse, Agent overreach, MCP                       -> tool_misuse/
+├─ Leak system prompt, history, or context                 -> data_exfiltration/
+├─ Non-English or low-resource language bypass             -> multi_language/
+├─ Markdown, HTML, Unicode, SVG rendering tricks           -> format_manipulation/
+└─ Unsure                                                  -> see _template.yaml
+```
 
 ---
 
 ## Hard Rules
 
-- ❌ Do NOT include malicious code, real PII, or real secrets in case files
-- ❌ Do NOT duplicate existing case IDs
-- ❌ Do NOT duplicate existing category names
-- ✅ The "defense" section of a case must be practically actionable
-- ✅ Cite sources when referencing external material (OWASP / MITRE ATLAS / papers, etc.)
+- Do NOT include malicious code, real PII, or real secrets
+- Do NOT include human-readable operation steps in `payloads`
+- Do NOT duplicate existing case IDs
+- Do NOT create a new directory without a prior approved Issue
+- Every `defense` must be practically actionable
+- Cite sources when referencing external material
 
 ## Pre-PR Checklist
 
@@ -108,9 +148,9 @@ Run:
 
 Expected output:
 
-    已加载 N 个类别，M 条用例。
+    Loaded 8 categories, N cases:
     ...
-    ✅ 全部用例校验通过。
+    All cases validated.
 
 ## Local Development
 
@@ -131,4 +171,4 @@ Python code follows `ruff`, line length 100:
 ## Reporting Issues
 
 Use GitHub Issues for bugs and feature requests.
-For security vulnerabilities, do NOT open a public issue — see `SECURITY.md`.
+For security vulnerabilities, do NOT open a public issue - see `SECURITY.md`.

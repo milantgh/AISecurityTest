@@ -56,14 +56,21 @@ def load_yaml(path: Path) -> Tuple[Optional[Dict], Optional[str]]:
 
 
 def discover_yaml_files(directory: Path, skip_prefix: str = "_") -> List[Path]:
-    """List all .yaml/.yml files in a directory (skipping files whose name starts with '_')."""
+    """List all .yaml/.yml files under a directory, recursively.
+
+    Files whose name starts with `skip_prefix` are skipped. Directories
+    starting with `skip_prefix` (e.g. `_legacy/`) are also skipped.
+    Recursion is needed because the case library is organized as
+    one-directory-per-category (direct/, indirect/, encoded/, ...).
+    """
     if not directory.is_dir():
         return []
     files = []
-    for p in sorted(directory.iterdir()):
+    for p in sorted(directory.rglob("*")):
         if not p.is_file():
             continue
-        if p.name.startswith(skip_prefix):
+        # Skip files/dirs under any path component starting with skip_prefix.
+        if any(part.startswith(skip_prefix) for part in p.relative_to(directory).parts):
             continue
         if p.suffix.lower() not in (".yaml", ".yml"):
             continue

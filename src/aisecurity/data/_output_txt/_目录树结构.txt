@@ -1,0 +1,69 @@
+C:\Users\Administrator\Desktop\AISecurityTest\src\aisecurity\data\cases
+├── _legacy
+│   ├── agent_chain.yaml
+│   ├── attacker_techniques.yaml
+│   ├── boundary.yaml
+│   ├── direct_injection.yaml
+│   ├── evasive.yaml
+│   ├── excessive_agency.yaml
+│   ├── indirect_injection.yaml
+│   ├── misinformation.yaml
+│   ├── multimodal.yaml
+│   ├── output_handling.yaml
+│   ├── poisoning.yaml
+│   ├── sensitive_leak.yaml
+│   ├── supply_chain.yaml
+│   ├── unbounded_consumption.yaml
+│   └── vector_embedding.yaml
+├── data_exfiltration
+│   ├── pi_031.yaml
+│   ├── pi_032.yaml
+│   ├── pi_034.yaml
+│   ├── pi_035.yaml
+│   └── pi_038.yaml
+├── direct
+│   ├── pi_001.yaml
+│   ├── pi_002.yaml
+│   ├── pi_003.yaml
+│   ├── pi_036.yaml
+│   ├── pi_037.yaml
+│   └── pi_040.yaml
+├── encoded
+│   ├── pi_019.yaml
+│   ├── pi_020.yaml
+│   └── pi_025.yaml
+├── format_manipulation
+│   ├── pi_023.yaml
+│   └── pi_033.yaml
+├── indirect
+│   ├── pi_004.yaml
+│   ├── pi_005.yaml
+│   ├── pi_006.yaml
+│   ├── pi_007.yaml
+│   ├── pi_021.yaml
+│   ├── pi_026.yaml
+│   ├── pi_027.yaml
+│   ├── pi_028.yaml
+│   ├── pi_041.yaml
+│   ├── pi_042.yaml
+│   └── pi_043.yaml
+├── multi_language
+├── role_confusion
+│   ├── pi_008.yaml
+│   ├── pi_009.yaml
+│   ├── pi_010.yaml
+│   ├── pi_011.yaml
+│   ├── pi_012.yaml
+│   ├── pi_013.yaml
+│   ├── pi_014.yaml
+│   ├── pi_015.yaml
+│   ├── pi_016.yaml
+│   ├── pi_017.yaml
+│   ├── pi_018.yaml
+│   └── pi_024.yaml
+├── tool_misuse
+│   ├── pi_022.yaml
+│   ├── pi_029.yaml
+│   ├── pi_030.yaml
+│   └── pi_039.yaml
+└── _template.yaml

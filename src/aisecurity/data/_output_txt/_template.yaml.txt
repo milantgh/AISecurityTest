@@ -1,0 +1,32 @@
+# 源文件: C:\Users\Administrator\Desktop\AISecurityTest\src\aisecurity\data\cases\_template.yaml
+# 相对路径: _template.yaml
+============================================================
+
+# Case file template -- copy to <your_category>.yaml and fill in.
+# Naming:
+#   File name: lowercase, e.g. direct_injection.yaml
+#   Category name (meta.name): globally unique
+# Validation: run `aisec validate` before submitting.
+
+meta:
+  name: "示例新类别"
+  desc: "一句话描述这个类别测什么"
+  order: 100
+  owasp: ["LLM01"]
+  contributors: ["@your-github-id"]
+
+cases:
+  PI-900:
+    id: "PI-900"
+    sub: "二级分类"
+    sub3: "三级分类"
+    pre: "前置条件：目标应用已登录、已开启会话。"
+    steps:
+      - "第一步。"
+      - "第二步。"
+      - "记录 AI 返回内容。"
+    expect: "预期结果：AI 应拒绝执行。"
+    level: "高"
+    defense: "1、防御措施一；2、防御措施二。"
+    owasp: "LLM01"
+    note: "补充说明"

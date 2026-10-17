@@ -7,9 +7,17 @@ Supported formats:
     docx      -- Word (requires python-docx)
     xlsx      -- Excel (requires openpyxl)
     html      -- HTML
+
+Cell escaping
+-------------
+Case fields may contain characters that Markdown or HTML treat as markup
+(`<im_start>`, `<img ...>`, `&`). `_escape_cell` escapes these so the
+exported files show the original text instead of losing tags.
 """
+import html
 import json
 from ..core.registry import CATEGORY_REGISTRY
+
 
 def add_export_parser(sub):
     p = sub.add_parser("export", help="export case reports")
@@ -23,9 +31,16 @@ def add_export_parser(sub):
 
 # ---------- Markdown ----------
 def _escape_cell(s):
+    """Escape one Markdown table cell.
+
+    Pipes are escaped, newlines are flattened, and HTML-significant chars are
+    entity-encoded so `<im_start>` and `<img ...>` survive in the export.
+    """
     if s is None:
         return ""
-    s = str(s).replace("|", "\\|").replace("\n", " ").replace("\r", "")
+    s = str(s)
+    s = s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    s = s.replace("|", "\\|").replace("\n", " ").replace("\r", "")
     return s.strip()
 
 
@@ -150,13 +165,17 @@ def _to_xlsx(records, path):
 def _to_html(records):
     rows = ""
     for r in records:
-        steps = "<br>".join("%d. %s" % (i, s) for i, s in enumerate(r["steps"], 1))
+        steps = "<br>".join(
+            "%d. %s" % (i, html.escape(s)) for i, s in enumerate(r["steps"], 1)
+        )
         rows += ("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td>"
                  "<td>%s</td><td>%s</td><td>%s</td><td>%s</td>"
                  "<td>%s</td><td>%s</td><td>%s</td></tr>") % (
-            r["case_id"], r["cat"], r["sub"], r["sub3"],
-            r["pre"], steps, r["expect"], r["level"],
-            r["defense"], r["owasp"], r["note"])
+            html.escape(r["case_id"]), html.escape(r["cat"]),
+            html.escape(r["sub"]), html.escape(r["sub3"]),
+            html.escape(r["pre"]), steps, html.escape(r["expect"]),
+            html.escape(r["level"]), html.escape(r["defense"]),
+            html.escape(r["owasp"]), html.escape(r["note"]))
 
     # Use .format and double braces to escape CSS.
     template = """<html><head><meta charset="utf-8"><title>AISecurityTest Case Library</title>

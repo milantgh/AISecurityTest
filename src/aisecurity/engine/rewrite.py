@@ -1,5 +1,15 @@
 # -*- coding: utf-8 -*-
-"""AI rewrite module (OpenAI-compatible/Ollama)."""
+"""AI rewrite module (OpenAI-compatible / Ollama).
+
+Two behaviors are important for correctness:
+
+1. The marker `<<AIST_OK>>` must only be mentioned in the prompt when the
+   input text actually contains it. Otherwise the model adds the marker to
+   its output even though the caller never asked for it.
+2. The rewritten output must be in the same language as the input. Without
+   this hint, an English style prompt on a Chinese input tends to produce
+   English output.
+"""
 import json
 import re
 import urllib.request
@@ -17,19 +27,44 @@ REWRITE_STYLES = {
 
 
 def build_rewrite_prompt(style, text, n_candidates=1):
+    """Build the rewrite prompt.
+
+    The marker is mentioned only when the input already contains it, so the
+    model does not inject a marker that was never requested.
+    """
     base = REWRITE_STYLES.get(style, "Rewrite the text below")
+    has_marker = PAYLOAD_MARKER in text
+
+    # Ask for the same output language as the input. Without this hint an
+    # English style prompt on Chinese text tends to produce English output.
+    lang_hint = "Output in the same language as the input."
+
     if n_candidates <= 1:
-        return ("%s. Keep the original meaning and all key markers "
-                "(such as %s) unchanged:\n%s") % (base, PAYLOAD_MARKER, text)
+        if has_marker:
+            return ("%s. %s Keep the original meaning and the marker %s "
+                    "unchanged:\n%s") % (base, lang_hint, PAYLOAD_MARKER, text)
+        return ("%s. %s Keep the original meaning unchanged:\n%s"
+                % (base, lang_hint, text))
+
+    if has_marker:
+        return (
+            "%s. %s Generate %d versions with different phrasing.\n"
+            "Requirements:\n"
+            "1. Each version must keep the original meaning, especially the marker "
+            "%s must be preserved exactly;\n"
+            "2. Separate versions with a line of \"---\";\n"
+            "3. Output only the rewritten results. No numbering, no explanations.\n\n"
+            "Original text:\n%s"
+        ) % (base, lang_hint, n_candidates, PAYLOAD_MARKER, text)
+
     return (
-        "%s. Generate %d versions with different phrasing.\n"
+        "%s. %s Generate %d versions with different phrasing.\n"
         "Requirements:\n"
-        "1. Each version must keep the original meaning, especially the marker "
-        "%s must be preserved exactly;\n"
+        "1. Each version must keep the original meaning;\n"
         "2. Separate versions with a line of \"---\";\n"
         "3. Output only the rewritten results. No numbering, no explanations.\n\n"
         "Original text:\n%s"
-    ) % (base, n_candidates, PAYLOAD_MARKER, text)
+    ) % (base, lang_hint, n_candidates, text)
 
 
 def parse_candidates(text, expect_count=1):

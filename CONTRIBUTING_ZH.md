@@ -1,98 +1,144 @@
 # 贡献指南
 
-感谢你想为 AISecurityTest 做贡献！本项目只需要你懂一件事就能贡献：往 YAML 文件里写用例。
+感谢你想为 AISecurityTest 做贡献！你只需要懂一件事就能贡献：往 YAML 文件里写用例。
+
+用例库的组织方式是 **一个目录一个分类，每目录一个 `cases.yaml`**。当前有 8 个分类：
+
+```
+src/aisecurity/data/cases/
+├── direct/cases.yaml
+├── indirect/cases.yaml
+├── encoded/cases.yaml
+├── role_confusion/cases.yaml
+├── tool_misuse/cases.yaml
+├── data_exfiltration/cases.yaml
+├── multi_language/cases.yaml
+└── format_manipulation/cases.yaml
+```
 
 ## 三类贡献方式
 
-### 1. 加用例（最容易，推荐第一次贡献选这个）
+### 1. 加一条用例（最容易，推荐第一次贡献选这个）
+
+**加用例不需要新建文件，也不需要新建目录。** 你只需要编辑最匹配的那个目录下的 `cases.yaml`。
 
 工作流：
 
-第 1 步：查看已有分类名（避免重名）：
-
-    aisec categories
-
-第 2 步：拿下一个可用 ID：
+第 1 步：拿下一个可用 ID：
 
     aisec next-id
 
-第 3 步：检查你的分类名是否唯一：
+第 2 步：选一个目录。见下面的「选哪个目录？」。不确定就选最接近的，reviewer 会帮你调整。
 
-    aisec check-name "你的新分类名"
+第 3 步：打开 `src/aisecurity/data/cases/<目录>/cases.yaml`，在 `cases:` 下加一条新用例。字段布局照抄同文件里已有的用例。
 
-第 4 步：看 `src/aisecurity/data/cases/_template.yaml`
+第 4 步：本地跑 `aisec validate`，看到「All cases validated」即通过。
 
-第 5 步：找到对应的类别文件（比如 `direct_injection.yaml`）
-
-第 6 步：在 `cases:` 下加一条新用例，字段照抄模板
-
-第 7 步：本地运行 `aisec validate`，看到「✅ 全部用例校验通过」即可
-
-第 8 步：提 PR
+第 5 步：提 PR。
 
 用例 ID 规范：
 
 - 格式 `PI-XXX`，全局唯一
-- 永远用下一个可用 ID——跑 `aisec next-id` 查看
+- 永远用下一个可用 ID——跑 `aisec next-id`
 - 不要预留号段、不要跳号
 - 不要复用已有用例的 ID
 
-风险等级：只能是 `严重` / `高` / `中-高` / `中` / `低`
+风险等级：只能是 `严重` / `高` / `中-高` / `中` / `低`。
 
-### 2. 加一个新类别
+#### 字段布局（顺序固定）
 
-1. 跑 `aisec categories` 查看已有分类名（避免重名）
-2. 跑 `aisec next-id` 拿下一个可用 ID
-3. 跑 `aisec check-name "你的类别名"` 确认不冲突
-4. 复制 `src/aisecurity/data/cases/_template.yaml` 为 `你的类别名.yaml`
-5. 填写 `meta` 部分（name 全局唯一，order 决定侧栏排序）
-6. 在 `cases:` 下加用例，ID 用第 2 步拿到的号
-7. `aisec validate` 通过后提 PR
+每条用例的字段顺序固定，贡献者打开任何文件看到的都是同一个形状：
+
+```yaml
+  PI-XXX:
+    id: "PI-XXX"
+    sub: "二级分类"
+    sub3: "三级分类"
+    pre: "前置条件"
+    steps:
+      - "给人看的操作步骤 1"
+      - "给人看的操作步骤 2"
+    payloads:
+      - "给机器发的真载荷"
+    expect: "正确防御时模型应该做什么"
+    level: "高"
+    defense: "可操作的防御措施"
+    owasp: "LLM01"
+    note: "补充说明"
+    source: "引用来源，或写 internal"
+    manual_only: false
+```
+
+| 字段 | 含义 |
+|---|---|
+| `id` | `PI-XXX`，全局唯一 |
+| `sub` / `sub3` | 二级/三级分类 |
+| `pre` | 前置条件 |
+| `steps` | **给人看的操作步骤**，保留给读者看，不会发给模型 |
+| `payloads` | **给机器发的真载荷**，会原样发给模型。如果启发式提取会误判你的 `steps`，必须用这个字段 |
+| `expect` | 正确防御时模型应该做什么 |
+| `level` | `严重` / `高` / `中-高` / `中` / `低` |
+| `defense` | 可操作的防御措施 |
+| `owasp` | OWASP LLM 编号 |
+| `note` | 补充说明 |
+| `source` | 引用来源，或写 `internal` |
+| `manual_only` | `true` 表示需要人工环境（上传、浏览器、RAG），`false` 表示纯 API 能自动跑 |
+
+#### `steps` 和 `payloads` 的区别
+
+- `steps` 给人看。想写多详细就写多详细。
+- `payloads` 给 runner 用。**只放真正要发给模型的攻击文本。**
+- 如果你的 `steps` 里有「场景1（…）：<im_start>...」这种描述+载荷混在一行的情况，把干净的载荷放进 `payloads`，避免 runner 把前缀也发出去。
+- 如果用例是 `manual_only: true`，`payloads` 可以为空。
+
+### 2. 加一个新分类（需要先讨论）
+
+**默认不允许。** 8 个分类是稳定的。新建目录必须先提 Issue。
+
+只有同时满足以下三个条件，才考虑新建分类：
+
+1. 现有 8 个目录都放不下你的用例
+2. 新攻击面有公开研究支撑（论文、CVE、报告）
+3. 你计划贡献至少 5 条用例，不是 1 条
+
+流程：
+
+1. 提 Issue，标题 `[新目录] <攻击面名称>`
+2. 内容包含：攻击面描述、为什么现有 8 个目录放不下、引用来源、计划贡献的用例数量
+3. 等维护者回复。通过后由维护者建目录和空的 `cases.yaml`，你再往里加用例
+4. 未讨论就提 PR 新建目录的，会被关闭
 
 ### 3. 加目标适配器（需要会 Python）
 
-参考 `src/aisecurity/targets/openai_compat.py`，实现 `Target` 抽象类的
-`send()` 方法。
+参考 `src/aisecurity/targets/openai_compat.py`，实现 `Target` 抽象类的 `send()` 方法。
 
 ---
 
-## 命名约定
+## 选哪个目录？
 
-文件名和分类名用同一个后缀。
-
-| 后缀 | 场景 | 文件名 | 分类名 |
-|---|---|---|---|
-| （无） | 中文原始 | `direct_injection.yaml` | `直接提示注入` |
-| `_en` | 英文 | `direct_injection_en.yaml` | `直接提示注入 EN` |
-| `_ja` | 日文 | `direct_injection_ja.yaml` | `直接提示注入 JA` |
-| `_v2` | 内容升级 | `direct_injection_v2.yaml` | `直接提示注入 v2` |
-| `_financial` | 金融行业 | `direct_injection_financial.yaml` | `直接提示注入（金融）` |
-| `_2025q4` | 时间批次 | `direct_injection_2025q4.yaml` | `直接提示注入 2025Q4` |
-
-为什么这么约定：文件名同前缀的，在目录里排在一起；
-分类名同前缀的，在侧栏里排在一起。用户一眼就知道它们属于同一类。
-
-分类名必须全局唯一。两个文件用同一个 `meta.name`，第二个会被拒绝加载。
-示例输出：
-
-    $ aisec validate
-    ...
-    ⚠ 发现问题：
-      - [my_file.yaml] 分类名 '直接提示注入' 已被 direct_injection.yaml 占用，本文件跳过。
-        请改一个唯一的分类名（如 '直接提示注入 EN' / '直接提示注入 v2' / '直接提示注入（金融）'）。
-        跑 `aisec categories` 查看已有分类名。
-
-改个分类名就好了。
+```
+你的用例主要测什么？
+├─ 直接让模型忽略/覆盖指令        → direct/
+├─ 通过文档/网页/邮件/工具输出注入 → indirect/
+├─ 编码：Base64/零宽/Leetspeak/Unicode Tags → encoded/
+├─ 角色扮演/越狱/人格切换         → role_confusion/
+├─ 工具越权/Agent 滥用/MCP        → tool_misuse/
+├─ 泄露 system prompt/历史/上下文 → data_exfiltration/
+├─ 非英语/低资源语言绕过          → multi_language/
+├─ Markdown/HTML/Unicode/SVG 技巧 → format_manipulation/
+└─ 不确定                        → 看 _template.yaml
+```
 
 ---
 
 ## 硬性规则
 
-- ❌ 不要在用例文件里写恶意代码、真实 PII、真实密钥
+- ❌ 不要写恶意代码、真实 PII、真实密钥
+- ❌ 不要把给人看的操作说明放进 `payloads`
 - ❌ 不要重复定义已有的用例 ID
-- ❌ 不要重复定义已有的分类名
-- ✅ 用例中的「防御方案」必须有实际可操作性
-- ✅ 引用外部资料时注明来源（OWASP / MITRE ATLAS / 论文等）
+- ❌ 不要未经 Issue 讨论就新建目录
+- ✅ 用例中的 `defense` 必须有实际可操作性
+- ✅ 引用外部资料时注明来源
 
 ## 提 PR 前自检
 
@@ -102,7 +148,7 @@
 
 输出如下即通过：
 
-    已加载 N 个类别，M 条用例。
+    已加载 8 个类别，N 条用例：
     ...
     ✅ 全部用例校验通过。
 

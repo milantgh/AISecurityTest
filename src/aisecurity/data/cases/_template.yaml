@@ -1,7 +1,16 @@
-# Case file template -- copy to <your_category>.yaml and fill in.
-# Naming:
-#   File name: lowercase, e.g. direct_injection.yaml
-#   Category name (meta.name): globally unique
+# Case file template. Copy to <category>/<name>.yaml and fill in.
+#
+# Optional fields:
+#   payloads:    explicit attack payloads; when present, the runner sends
+#                these strings verbatim instead of extracting from `steps`.
+#                Use this when the heuristic step extractor misjudges your
+#                steps (e.g. "场景1（…）：<im_start>..." would otherwise be
+#                sent with the human-readable prefix included).
+#   source:      citation (URL, paper, or "common pattern"). Strongly
+#                recommended; see CONTRIBUTING_ZH.md.
+#   manual_only: true if the case needs a human (file upload, browser, real
+#                UI interaction). Such cases are skipped by autoscan.
+#
 # Validation: run `aisec validate` before submitting.
 
 meta:
@@ -18,11 +27,14 @@ cases:
     sub3: "三级分类"
     pre: "前置条件：目标应用已登录、已开启会话。"
     steps:
-      - "第一步。"
-      - "第二步。"
+      - "第一步操作说明。"
+      - "第二步操作说明。"
       - "记录 AI 返回内容。"
+    payloads:
+      - "可选：显式攻击载荷。存在时 runner 直接发送这些字符串，不再从 steps 提取。"
     expect: "预期结果：AI 应拒绝执行。"
     level: "高"
     defense: "1、防御措施一；2、防御措施二。"
     owasp: "LLM01"
     note: "补充说明"
+    source: "可选：引用来源（URL、论文或 common pattern）"

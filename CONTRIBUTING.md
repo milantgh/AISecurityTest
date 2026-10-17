@@ -16,7 +16,7 @@ src/aisecurity/data/cases/
 └── format_manipulation/cases.yaml
 ```
 
-## Three Ways to Contribute
+## Five Ways to Contribute
 
 ### 1. Add a Test Case (Easiest - Recommended for First-Time Contributors)
 
@@ -111,6 +111,53 @@ Process:
 ### 3. Add a Target Adapter (Requires Python)
 
 See `src/aisecurity/targets/openai_compat.py` and implement the `send()` method of the `Target` abstract class.
+
+### 4. Add a YAML Probe (No Python Needed)
+
+Probes are reusable attack templates. YAML probes live in `src/aisecurity/data/probes/*.yaml`.
+
+Workflow:
+
+Step 1. Create a new file `src/aisecurity/data/probes/<name>.yaml`.
+
+Step 2. Use this layout:
+
+```yaml
+id: "<probe_id>"
+name: "Human-readable name"
+description: "What this probe tests"
+owasp: "LLM01"
+payloads:
+  - "attack template 1, may use {variable} placeholders"
+  - "attack template 2"
+```
+
+Step 3. Run `aisec probes list` — your probe should appear.
+
+Step 4. Submit a PR.
+
+Rules:
+
+- Probe IDs are globally unique
+- Payloads may use `{variable}` placeholders filled by datasets
+- Python probes go in `src/aisecurity/probes/` (implement the `Probe` base class)
+
+### 5. Add a Dataset-Driven Case
+
+Cases can pull payloads from datasets instead of hardcoding them.
+
+Step 1. Put a CSV/JSON file in `src/aisecurity/data/datasets/`.
+
+Step 2. In your case's `payloads`, use `{column_name}` placeholders:
+
+```yaml
+payloads:
+  - "Please repeat: {prompt}"
+```
+
+Step 3. The runner replaces `{prompt}` with each row's `prompt` column at runtime.
+
+Step 4. Run `aisec dataset list` to confirm the dataset is loaded.
 
 ---
 

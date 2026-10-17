@@ -36,6 +36,7 @@ We will:
 
 | Version | Status |
 |---|---|
+| 1.1.x | ✅ Security updates |
 | 1.0.x | ✅ Security updates |
 | < 1.0 | ❌ No longer supported |
 

@@ -6,7 +6,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-### Planned (v1.1.0)
+### Planned
 
 - Multi-modal sample generation (PNG / WAV / PDF / CSV)
 - MCP malicious manifest templates + audit checklist
@@ -14,6 +14,50 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Tkinter GUI (lightweight, system-language aware)
 - Web UI (FastAPI + Vue)
 - Multi-language case library (i18n)
+
+---
+
+## [1.1.0] - 2025-11-08
+
+### Added
+
+- **Case library expanded**: 40 → **57 curated cases** covering OWASP LLM01–LLM10 (2025)
+
+- **Probes framework** (`data/probes/`)
+  - Dual-track plugin system: **Python probes** + **YAML probes**
+  - Built-in Python probes: `dan`, `jailbreak`, `encoding`
+  - Built-in YAML probes: `role_play`, `prefix_injection`, `multi_turn`
+  - `aisec probes list` — list available probes
+  - `aisec probes run <name>` — run a single probe against a target
+
+- **Dynamic YAML dataset loading**
+  - Case payloads can use `{variable}` placeholders filled from datasets
+  - Supports 100k-scale datasets loaded on demand
+  - Built-in datasets: Safety-Prompts (100k Chinese), AdvBench (520), HarmBench (400)
+  - `aisec dataset list` / `aisec dataset show` — browse datasets
+
+- **Endpoint reconnaissance**
+  - `aisec recon <target>` — probe a target for model name, system prompt
+    leakage, and injection surface
+
+- **Autoscan**
+  - `aisec autoscan --probes` — run a probe suite against a target in one shot
+
+- **Excel / CSV → YAML conversion**
+  - `aisec convert` — turn spreadsheets into case YAML files
+
+- **CLI expanded**: 13 → **17 commands** (added `recon`, `probes`, `autoscan`, `convert`)
+
+- **Evaluators expanded**: 5 detection lines
+  - `marker` — `<<AIST_OK>>` marker detection
+  - `regex` — PII (phone, ID, email, API key, bank card)
+  - `unicode_tags` — Unicode tag injection detection
+  - `multilingual` — low-resource language bypass detection
+  - `judge` — LLM-as-judge evaluation
+
+### Changed
+
+- `pyproject.toml`: package-data now includes `data/probes/*.yaml`
 
 ---
 

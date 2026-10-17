@@ -12,14 +12,19 @@ Docker, without a server, without a database.**
 
 ## What it does
 
-- **40 curated test cases** covering OWASP LLM01–LLM10 (2025)
+- **57 curated test cases** covering OWASP LLM01–LLM10 (2025)
 - **YAML-driven case library** — add new cases without writing Python
-- **13 CLI commands** — browse, generate, transform, rewrite, run, export
+- **17 CLI commands** — browse, generate, transform, rewrite, run, export, recon, probes, autoscan
+- **Probes framework** — dual-track plugin system (Python + YAML) for jailbreak / DAN / encoding / role-play / prefix-injection / multi-turn
+- **Dynamic YAML dataset loading** — drive cases with 100k-scale datasets (Safety-Prompts, AdvBench, HarmBench) via `{variable}` placeholders
+- **Endpoint reconnaissance** — `aisec recon` probes targets for model name, system prompt leakage, and injection surface
+- **Autoscan** — one-shot `aisec autoscan --probes` to run probe suites against a target
+- **Excel/CSV → YAML conversion** — turn spreadsheets into case files
 - **Text transform toolbox** — zero-width, Base64, hex, homoglyph, ChatML/Llama markers
 - **Three-layer payload composer** — carrier × tactic × payload
 - **Marker-based verification** — `<<AIST_OK>>` proves whether a payload survived rewriting
 - **Pluggable targets** — OpenAI-compatible APIs
-- **Built-in evaluators** — marker detection & regex-based PII detection
+- **Built-in evaluators** — marker, regex, Unicode tags, multilingual, LLM-judge (5 detection lines)
 - **Report export** — Markdown / JSON / Word / Excel / HTML
 - **Defensive loading** — one broken YAML file never breaks the whole library
 - **Contributor-friendly CLI** — `aisec categories`, `aisec next-id`, `aisec check-name`

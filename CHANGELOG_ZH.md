@@ -57,6 +57,8 @@
 ### 变更
 
 - `pyproject.toml`：package-data 新增 `data/probes/*.yaml`
+- `pyproject.toml`：放宽 `reportlab` 约束，从 `<4.0` 改为 `>=3.6.13`，
+  使 Python 3.12 可安装 reportlab 4.x（3.6.x 无 3.12 wheel）
 
 ---
 

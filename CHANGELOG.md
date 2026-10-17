@@ -58,6 +58,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 
 - `pyproject.toml`: package-data now includes `data/probes/*.yaml`
+- `pyproject.toml`: loosened `reportlab` constraint from `<4.0` to `>=3.6.13`
+  so Python 3.12 can install reportlab 4.x (3.6.x has no 3.12 wheel)
 
 ---
 

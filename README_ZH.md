@@ -125,11 +125,11 @@ python -m pytest tests/ -v
 
 ## 文档
 
-- `README.md` / `README_ZH.md` —— 中英双语
-- `CONTRIBUTING.md` / `CONTRIBUTING_ZH.md` —— 中英双语
-- `SECURITY.md` / `SECURITY_ZH.md` —— 中英双语
-- `CHANGELOG.md` / `CHANGELOG_ZH.md` —— 中英双语
+- `README.md` / `README_ZH.md`
+- `CONTRIBUTING.md` / `CONTRIBUTING_ZH.md`
+- `SECURITY.md` / `SECURITY_ZH.md`
+- `CHANGELOG.md` / `CHANGELOG_ZH.md`
 
 ## 许可证
 
-MIT
+MIT License

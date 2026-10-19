@@ -126,11 +126,11 @@ python -m pytest tests/ -v
 
 ## Documentation
 
-- `README.md` / `README_ZH.md` — bilingual
-- `CONTRIBUTING.md` / `CONTRIBUTING_ZH.md` — bilingual
-- `SECURITY.md` / `SECURITY_ZH.md` — bilingual
-- `CHANGELOG.md` / `CHANGELOG_ZH.md` — bilingual
+- `README.md` / `README_ZH.md`
+- `CONTRIBUTING.md` / `CONTRIBUTING_ZH.md`
+- `SECURITY.md` / `SECURITY_ZH.md`
+- `CHANGELOG.md` / `CHANGELOG_ZH.md`
 
 ## License
 
-MIT
+MIT License

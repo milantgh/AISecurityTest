@@ -19,7 +19,7 @@ from ..runner.result import CaseResult
 
 
 def add_probes_parser(sub):
-    p = sub.add_parser("probes", help="list and run attack probes (garak-style)")
+    p = sub.add_parser("probes", help="list and run attack probes")
     sp = p.add_subparsers(dest="probe_cmd")
 
     # ---- list ----

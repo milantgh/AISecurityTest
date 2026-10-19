@@ -32,6 +32,7 @@ from .cmd_multimodal import add_multimodal_parser, handle_multimodal
 from .cmd_autoscan import add_autoscan_parser, handle_autoscan   # 新增
 from .cmd_recon import add_recon_parser, handle_recon             # 新增
 from .cmd_probes import add_probes_parser, handle_probes          # 新增
+from .cmd_vuln import add_vuln_parser, handle_vuln                # 新增
 
 
 def build_parser():
@@ -58,6 +59,7 @@ def build_parser():
     add_autoscan_parser(sub)   # 新增
     add_recon_parser(sub)      # 新增
     add_probes_parser(sub)     # 新增
+    add_vuln_parser(sub)       # 新增
     return p
 
 
@@ -92,6 +94,7 @@ def main(argv=None):
         "autoscan": handle_autoscan,   # 新增
         "recon": handle_recon,          # 新增
         "probes": handle_probes,        # 新增
+        "vuln": handle_vuln,            # 新增
     }
     return handlers[args.cmd](args)
 

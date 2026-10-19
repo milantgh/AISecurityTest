@@ -17,48 +17,35 @@
 
 ---
 
-## [1.1.0] - 2025-11-08
+## [1.1.0] - 2025-10-20
 
 ### 新增
 
-- **用例库扩容**：40 → **57 条精选用例**，覆盖 OWASP LLM01–LLM10 (2025)
+- **漏洞扫描器**（`vulnscan/` 模块 + `aisec vuln` 命令）
+  - 两阶段流程：指纹识别 → 版本判定 → CVE 匹配
+  - 默认被动；`--active` 启用确认请求
+  - YAML 驱动规则：`data/fingerprints/` + `data/vuln/`
+  - 通过 `AISecurityTest_RULES_PATH` 加载外部规则
+  - 内置指纹：Ollama、vLLM、ComfyUI
+  - 内置 CVE：CVE-2024-37032（Ollama <0.1.34 路径穿越 RCE）
+  - 退出码：0 = 无漏洞，2 = 发现 CRITICAL（可接入 CI/CD）
 
-- **Probes 探针框架**（`data/probes/`）
-  - Python + YAML **双轨制插件系统**
-  - 内置 Python 探针：`dan`、`jailbreak`、`encoding`
-  - 内置 YAML 探针：`role_play`、`prefix_injection`、`multi_turn`
-  - `aisec probes list` —— 列出可用探针
-  - `aisec probes run <name>` —— 对目标运行单个探针
+- **探针框架**（`probes/` 模块）
+  - 可插拔的 LLM 端点安全探针
 
-- **动态 YAML 数据集加载**
-  - 用例载荷支持 `{变量}` 占位符，由数据集填充
-  - 支持按需加载 10 万级数据集
-  - 内置数据集：Safety-Prompts（10 万中文）、AdvBench（520）、HarmBench（400）
-  - `aisec dataset list` / `aisec dataset show` —— 浏览数据集
-
-- **端点侦察**
-  - `aisec recon <目标>` —— 探测目标的模型名、system prompt 泄露与注入面
-
-- **自动扫描**
-  - `aisec autoscan --probes` —— 一键对目标运行探针套件
-
-- **Excel / CSV → YAML 转换**
-  - `aisec convert` —— 把表格转成用例 YAML 文件
-
-- **CLI 扩容**：13 → **17 个命令**（新增 `recon`、`probes`、`autoscan`、`convert`）
-
-- **评估器扩容**：5 条检测线
-  - `marker` —— `<<AIST_OK>>` 标记检测
-  - `regex` —— PII（手机号、身份证、邮箱、API Key、银行卡）
-  - `unicode_tags` —— Unicode 标签注入检测
-  - `multilingual` —— 低资源语言绕过检测
-  - `judge` —— LLM 裁判评估
+- **越狱数据集**（`jailbreak_dataset/`）
+  - 14 个危害类别、400+ 条采样提示词
 
 ### 变更
 
-- `pyproject.toml`：package-data 新增 `data/probes/*.yaml`
-- `pyproject.toml`：放宽 `reportlab` 约束，从 `<4.0` 改为 `>=3.6.13`，
-  使 Python 3.12 可安装 reportlab 4.x（3.6.x 无 3.12 wheel）
+- CLI 命令数：13 → 18
+- 测试用例数：40 → 57
+- `pyproject.toml`：package-data 包含 `fingerprints/` 和 `vuln/`
+- `reportlab>=3.6.13` 移除上限以兼容 Python 3.12
+
+### 修复
+
+- 打包产物缺少子目录 YAML 文件
 
 ---
 

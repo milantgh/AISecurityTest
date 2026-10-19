@@ -16,7 +16,7 @@ src/aisecurity/data/cases/
 └── format_manipulation/cases.yaml
 ```
 
-## Five Ways to Contribute
+## Three Ways to Contribute
 
 ### 1. Add a Test Case (Easiest - Recommended for First-Time Contributors)
 
@@ -112,52 +112,66 @@ Process:
 
 See `src/aisecurity/targets/openai_compat.py` and implement the `send()` method of the `Target` abstract class.
 
-### 4. Add a YAML Probe (No Python Needed)
+### 4. Add a Fingerprint / CVE Rule (No Python Required)
 
-Probes are reusable attack templates. YAML probes live in `src/aisecurity/data/probes/*.yaml`.
+The `vuln` scanner is fully YAML-driven. Adding a new component or CVE only requires a YAML file.
 
-Workflow:
+#### Add a component fingerprint
 
-Step 1. Create a new file `src/aisecurity/data/probes/<name>.yaml`.
-
-Step 2. Use this layout:
+Create `<component_id>.yaml` in `src/aisecurity/data/fingerprints/`:
 
 ```yaml
-id: "<probe_id>"
-name: "Human-readable name"
-description: "What this probe tests"
-owasp: "LLM01"
-payloads:
-  - "attack template 1, may use {variable} placeholders"
-  - "attack template 2"
+id: my_component
+name: My Component
+vendor: Vendor
+category: llm-serving
+description: "Component description"
+match:
+  any:
+    - path: /
+      status: 200
+      body_contains: "signature string"
+    - path: /api/version
+      status: 200
+      body_regex: '"version"\s*:\s*"[0-9.]+'
+version:
+  path: /api/version
+  body_regex: '"version"\s*:\s*"([0-9.]+)"'
 ```
 
-Step 3. Run `aisec probes list` — your probe should appear.
+- `match.any`: any condition hit means identified (OR relation)
+- Supported conditions: `status` / `body_contains` / `body_regex` / `header_contains` / `header_regex`
+- `version`: extract version from a path using a regex (capture group 1)
 
-Step 4. Submit a PR.
+#### Add a CVE rule
 
-Rules:
-
-- Probe IDs are globally unique
-- Payloads may use `{variable}` placeholders filled by datasets
-- Python probes go in `src/aisecurity/probes/` (implement the `Probe` base class)
-
-### 5. Add a Dataset-Driven Case
-
-Cases can pull payloads from datasets instead of hardcoding them.
-
-Step 1. Put a CSV/JSON file in `src/aisecurity/data/datasets/`.
-
-Step 2. In your case's `payloads`, use `{column_name}` placeholders:
+Create `<CVE-ID>.yaml` in `src/aisecurity/data/vuln/`:
 
 ```yaml
-payloads:
-  - "Please repeat: {prompt}"
+id: CVE-2024-XXXXX
+title: "Vulnerability title"
+component: my_component
+severity: HIGH
+affected: "<2.0.0"
+description: "Vulnerability description"
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2024-XXXXX
+remediation: "Upgrade to 2.0.0 or later"
+owasp_tags: [LLM05]
+check:
+  mode: version
 ```
 
-Step 3. The runner replaces `{prompt}` with each row's `prompt` column at runtime.
+- `component`: must correspond to a fingerprint id
+- `severity`: `CRITICAL` / `HIGH` / `MEDIUM` / `LOW` / `INFO`
+- `affected`: version range — `*` (all), `>=1.2,<1.5`, `<=2.0`, `==1.2.3` (comma = AND)
+- `check.mode`: `version` (passive, version comparison only) / `request` (active verification, needs `--active`)
 
-Step 4. Run `aisec dataset list` to confirm the dataset is loaded.
+Validate before submitting:
+
+```
+aisec vuln validate
+```
 
 ---
 

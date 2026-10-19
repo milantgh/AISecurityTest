@@ -16,7 +16,7 @@ src/aisecurity/data/cases/
 └── format_manipulation/cases.yaml
 ```
 
-## 五类贡献方式
+## 三类贡献方式
 
 ### 1. 加一条用例（最容易，推荐第一次贡献选这个）
 
@@ -112,52 +112,66 @@ src/aisecurity/data/cases/
 
 参考 `src/aisecurity/targets/openai_compat.py`，实现 `Target` 抽象类的 `send()` 方法。
 
-### 4. 加 YAML 探针（不需要 Python）
+### 4. 加指纹 / CVE 规则（不需要 Python）
 
-探针是可复用的攻击模板。YAML 探针放在 `src/aisecurity/data/probes/*.yaml`。
+`vuln` 扫描器完全 YAML 驱动。加新组件或新 CVE 只需加 YAML 文件。
 
-工作流：
+#### 加组件指纹
 
-第 1 步：新建文件 `src/aisecurity/data/probes/<名称>.yaml`。
-
-第 2 步：使用如下布局：
+在 `src/aisecurity/data/fingerprints/` 下新建 `<component_id>.yaml`：
 
 ```yaml
-id: "<探针ID>"
-name: "给人看的名称"
-description: "这个探针测什么"
-owasp: "LLM01"
-payloads:
-  - "攻击模板 1，可使用 {变量} 占位符"
-  - "攻击模板 2"
+id: my_component
+name: 我的组件
+vendor: 厂商
+category: llm-serving
+description: "组件描述"
+match:
+  any:
+    - path: /
+      status: 200
+      body_contains: "特征字符串"
+    - path: /api/version
+      status: 200
+      body_regex: '"version"\s*:\s*"[0-9.]+'
+version:
+  path: /api/version
+  body_regex: '"version"\s*:\s*"([0-9.]+)"'
 ```
 
-第 3 步：跑 `aisec probes list`，你的探针应该出现在列表里。
+- `match.any`：任一条件命中即识别（OR 关系）
+- 支持条件：`status` / `body_contains` / `body_regex` / `header_contains` / `header_regex`
+- `version`：从指定路径用正则提取版本号（捕获组 1）
 
-第 4 步：提 PR。
+#### 加 CVE 规则
 
-规则：
-
-- 探针 ID 全局唯一
-- payload 可使用 `{变量}` 占位符，由数据集填充
-- Python 探针放在 `src/aisecurity/probes/`（实现 `Probe` 基类）
-
-### 5. 加数据集驱动的用例
-
-用例可以从数据集拉取 payload，而不是硬编码。
-
-第 1 步：把 CSV/JSON 文件放到 `src/aisecurity/data/datasets/`。
-
-第 2 步：在用例的 `payloads` 中使用 `{列名}` 占位符：
+在 `src/aisecurity/data/vuln/` 下新建 `<CVE-ID>.yaml`：
 
 ```yaml
-payloads:
-  - "请复述：{prompt}"
+id: CVE-2024-XXXXX
+title: "漏洞标题"
+component: my_component
+severity: HIGH
+affected: "<2.0.0"
+description: "漏洞描述"
+references:
+  - https://nvd.nist.gov/vuln/detail/CVE-2024-XXXXX
+remediation: "升级到 2.0.0 或更高版本"
+owasp_tags: [LLM05]
+check:
+  mode: version
 ```
 
-第 3 步：runner 运行时会把 `{prompt}` 替换为每行 `prompt` 列的值。
+- `component`：必须与指纹 id 对应
+- `severity`：`CRITICAL` / `HIGH` / `MEDIUM` / `LOW` / `INFO`
+- `affected`：版本范围——`*`（全部）、`>=1.2,<1.5`、`<=2.0`、`==1.2.3`（逗号 = AND）
+- `check.mode`：`version`（被动，仅版本比对）/ `request`（主动验证，需 `--active`）
 
-第 4 步：跑 `aisec dataset list` 确认数据集已加载。
+提交前校验：
+
+```
+aisec vuln validate
+```
 
 ---
 

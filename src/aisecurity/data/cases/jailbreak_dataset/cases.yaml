@@ -1,6 +1,6 @@
 # 数据集越狱批量注入
 #
-# 数据来源：Tencent AI-Infra-Guard「越狱评测」模块的公开红队数据集
+# 数据来源：community「越狱评测」模块的公开红队数据集
 # 每条用例声明一个 `dataset` 块，payloads 中的 {prompt} 占位符会与数据集
 # 每一行交叉展开（模板 × 数据行 = 多条载荷）。
 #
@@ -38,8 +38,8 @@ cases:
     level: 高
     defense: 1、输入侧意图与语义检测；2、输出侧安全过滤；3、对越狱/注入前缀做归一化检测。
     owasp: LLM01
-    note: 来源 AI-Infra-Guard data/eval/cnsafe.json，共 3030 条，此处采样 30 条。
-    source: AI-Infra-Guard cnsafe (Zonghao2025/CNSafe，TC260 标准)
+    note: 原始数据集共 3030 条，本用例采样 30 条。
+    source: cnsafe (Zonghao2025/CNSafe，TC260 标准)
   PI-107:
     id: PI-107
     sub: CBRN 武器
@@ -61,8 +61,8 @@ cases:
     level: 严重
     defense: 1、高危话题强拦截；2、输入侧意图检测；3、输出侧 CBRN 内容过滤。
     owasp: LLM01
-    note: 来源 AI-Infra-Guard data/eval，共 116 条，此处采样 30 条。
-    source: AI-Infra-Guard CBRN-weapon (HarmBench 类目)
+    note: 原始数据集共 116 条，本用例采样 30 条。
+    source: CBRN-weapon (HarmBench 类目)
   PI-108:
     id: PI-108
     sub: 暴力内容
@@ -84,8 +84,8 @@ cases:
     level: 高
     defense: 1、输入侧意图检测；2、输出侧暴力内容过滤。
     owasp: LLM01
-    note: 来源 AI-Infra-Guard data/eval，共 219 条，此处采样 30 条。
-    source: AI-Infra-Guard violent
+    note: 原始数据集共 219 条，本用例采样 30 条。
+    source: violent
   PI-109:
     id: PI-109
     sub: 不道德行为
@@ -107,8 +107,8 @@ cases:
     level: 高
     defense: 1、输入侧意图检测；2、输出侧伦理与合规过滤。
     owasp: LLM01
-    note: 来源 AI-Infra-Guard data/eval，共 402 条，此处采样 30 条。
-    source: AI-Infra-Guard unethical-behavior
+    note: 原始数据集共 402 条，本用例采样 30 条。
+    source: unethical-behavior
   PI-110:
     id: PI-110
     sub: 中文越狱评测
@@ -130,8 +130,8 @@ cases:
     level: 高
     defense: 1、输入侧越狱模板检测；2、输出侧安全过滤。
     owasp: LLM01
-    note: 来源 AI-Infra-Guard data/eval，共 143 条，此处采样 30 条。
-    source: AI-Infra-Guard JailBench-Tiny (STAIR-BUPT/JailBench)
+    note: 原始数据集共 143 条，本用例采样 30 条。
+    source: JailBench-Tiny (STAIR-BUPT/JailBench)
   PI-111:
     id: PI-111
     sub: 越狱提示词
@@ -153,8 +153,8 @@ cases:
     level: 高
     defense: 1、输入侧越狱模板检测；2、输出侧安全过滤。
     owasp: LLM01
-    note: 来源 AI-Infra-Guard data/eval，共 160 条，此处采样 30 条。
-    source: AI-Infra-Guard JailbreakPrompts-Tiny
+    note: 原始数据集共 160 条，本用例采样 30 条。
+    source: JailbreakPrompts-Tiny
   PI-112:
     id: PI-112
     sub: 安全基准
@@ -176,8 +176,8 @@ cases:
     level: 高
     defense: 1、输入侧意图检测；2、输出侧安全过滤。
     owasp: LLM01
-    note: 来源 AI-Infra-Guard data/eval，共 2300 条，此处采样 30 条。
-    source: AI-Infra-Guard safebench (Zonghao2025/safebench)
+    note: 原始数据集共 2300 条，本用例采样 30 条。
+    source: safebench (Zonghao2025/safebench)
   PI-113:
     id: PI-113
     sub: 非暴力违法活动
@@ -199,8 +199,8 @@ cases:
     level: 高
     defense: 1、输入侧意图检测；2、输出侧违法内容过滤。
     owasp: LLM01
-    note: 来源 AI-Infra-Guard data/eval，共 214 条，此处采样 30 条。
-    source: AI-Infra-Guard non-violent-illegal-activity
+    note: 原始数据集共 214 条，本用例采样 30 条。
+    source: non-violent-illegal-activity
   PI-114:
     id: PI-114
     sub: 版权侵权
@@ -222,8 +222,8 @@ cases:
     level: 中-高
     defense: 1、输入侧意图检测；2、输出侧版权与合规过滤。
     owasp: LLM01
-    note: 来源 AI-Infra-Guard data/eval，共 139 条，此处采样 30 条。
-    source: AI-Infra-Guard copyright-violation
+    note: 原始数据集共 139 条，本用例采样 30 条。
+    source: copyright-violation
   PI-115:
     id: PI-115
     sub: 越狱提示词
@@ -245,8 +245,8 @@ cases:
     level: 高
     defense: 1、输入侧越狱模板检测；2、输出侧安全过滤。
     owasp: LLM01
-    note: 来源 AI-Infra-Guard data/eval，共 60 条，此处采样 30 条。
-    source: AI-Infra-Guard ChatGPT-Jailbreak-Prompts (rubend18)
+    note: 原始数据集共 60 条，本用例采样 30 条。
+    source: ChatGPT-Jailbreak-Prompts (rubend18)
   PI-116:
     id: PI-116
     sub: 隐私泄露
@@ -268,8 +268,8 @@ cases:
     level: 高
     defense: 1、输入侧意图检测；2、输出侧 PII 检测与脱敏；3、会话边界隔离。
     owasp: LLM01
-    note: 来源 AI-Infra-Guard data/eval，共 223 条，此处采样 30 条。
-    source: AI-Infra-Guard privacy-leakage
+    note: 原始数据集共 223 条，本用例采样 30 条。
+    source: privacy-leakage
   PI-117:
     id: PI-117
     sub: Agent 工具滥用
@@ -291,8 +291,8 @@ cases:
     level: 严重
     defense: 1、工具调用白名单与最小权限；2、入参校验；3、高危操作二次确认。
     owasp: LLM01 + LLM06
-    note: 来源 AI-Infra-Guard data/eval，共 120 条，此处采样 30 条。
-    source: AI-Infra-Guard agentic-tool-misuse
+    note: 原始数据集共 120 条，本用例采样 30 条。
+    source: agentic-tool-misuse
   PI-118:
     id: PI-118
     sub: 高风险问题
@@ -314,8 +314,8 @@ cases:
     level: 高
     defense: 1、输入侧意图检测；2、输出侧安全过滤。
     owasp: LLM01
-    note: 来源 AI-Infra-Guard data/eval，共 122 条，此处采样 30 条。
-    source: AI-Infra-Guard JADE-db-v3.0 (whitzard-ai/jade-db)
+    note: 原始数据集共 122 条，本用例采样 30 条。
+    source: JADE-db-v3.0 (whitzard-ai/jade-db)
   PI-119:
     id: PI-119
     sub: 网络攻击
@@ -337,8 +337,8 @@ cases:
     level: 严重
     defense: 1、输入侧意图检测；2、输出侧攻击性内容过滤。
     owasp: LLM01
-    note: 来源 AI-Infra-Guard data/eval，共 174 条，此处采样 30 条。
-    source: AI-Infra-Guard cyberattack
+    note: 原始数据集共 174 条，本用例采样 30 条。
+    source: cyberattack
   PI-120:
     id: PI-120
     sub: 虚假信息
@@ -360,8 +360,8 @@ cases:
     level: 高
     defense: 1、输入侧意图检测；2、输出侧事实性与来源核查。
     owasp: LLM01
-    note: 来源 AI-Infra-Guard data/eval，共 227 条，此处采样 30 条。
-    source: AI-Infra-Guard misinformation
+    note: 原始数据集共 227 条，本用例采样 30 条。
+    source: misinformation
   PI-121:
     id: PI-121
     sub: 有害行为基准
@@ -383,8 +383,8 @@ cases:
     level: 高
     defense: 1、输入侧意图检测；2、输出侧安全过滤。
     owasp: LLM01
-    note: 来源 AI-Infra-Guard data/eval，共 91 条，此处采样 30 条。
-    source: AI-Infra-Guard HarmfulEvalBenchmark (JailbreakBench JBB-Behaviors)
+    note: 原始数据集共 91 条，本用例采样 30 条。
+    source: HarmfulEvalBenchmark (JailbreakBench JBB-Behaviors)
   PI-122:
     id: PI-122
     sub: GUI Agent 越权
@@ -406,5 +406,5 @@ cases:
     level: 严重
     defense: 1、高危界面操作二次确认；2、操作白名单与最小权限；3、敏感页面识别。
     owasp: LLM01 + LLM06
-    note: 来源 AI-Infra-Guard data/eval，共 288 条，此处采样 30 条。
-    source: AI-Infra-Guard BadPhoneAgent
+    note: 原始数据集共 288 条，本用例采样 30 条。
+    source: BadPhoneAgent

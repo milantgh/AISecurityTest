@@ -194,14 +194,3 @@ the program from starting.
 | Marker mechanism | Attack success can be judged automatically |
 | Globally sequential IDs | No conflict even across languages |
 
-## Compared to Similar Tools
-
-AISecurityTest is **not** a full-stack scanning platform. It is a **payload toolkit**.
-
-| | AISecurityTest | AI-Infra-Guard |
-|---|---|---|
-| Focus | Payload generation & transformation | Full-stack scanning platform |
-| Deployment | `pip install` / local | Docker + Web UI |
-| CVE scan | ✗ | ✓ (2000+ rules) |
-| Case library | YAML, community-editable | Rule-based |
-| Best for | Hands-on red team, prompt engineering | Enterprise scanning |

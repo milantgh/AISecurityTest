@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "aisecurity-test"
 version = "1.1.0"
-description = "AI Security Test - A lightweight OWASP LLM Top10 (2025) red-team payload toolkit with 57 curated cases, 17 CLI commands, and a probes/dataset framework"
+description = "AI Security Test - A lightweight OWASP LLM Top10 (2025) red-team payload toolkit with 57 curated cases, 18 CLI commands, a probes/dataset framework, and a pluggable CVE/fingerprint scan (vuln)"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}
@@ -79,7 +79,7 @@ Issues = "https://github.com/milantgh/AISecurityTest/issues"
 where = ["src"]
 
 [tool.setuptools.package-data]
-aisecurity = ["data/cases/*.yaml", "data/datasets/*.csv", "data/datasets/*.json", "data/probes/*.yaml"]
+aisecurity = ["data/cases/*.yaml", "data/cases/**/*.yaml", "data/datasets/*.csv", "data/datasets/*.json", "data/probes/*.yaml", "data/fingerprints/*.yaml", "data/fingerprints/*.md", "data/vuln/*.yaml", "data/vuln/*.md"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

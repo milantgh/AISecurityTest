@@ -38,7 +38,7 @@ from .cmd_vuln import add_vuln_parser, handle_vuln                # 新增
 def build_parser():
     p = argparse.ArgumentParser(
         prog="aisec",
-        description="AISecurityTest - AI Security Test System (v1.1)")
+        description="AISecurityTest - AI Security Test System (v1.0)")
     p.add_argument("--version", action="store_true", help="show version")
     sub = p.add_subparsers(dest="cmd")
 

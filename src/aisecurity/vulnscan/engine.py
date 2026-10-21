@@ -106,6 +106,13 @@ def _safe_search(pattern, text, flags=0):
         return None
 
 
+def _header_text(headers: Dict[str, str], name: str) -> str:
+    """Return one header value, or the whole raw header block for ``"*"``."""
+    if name == "*":
+        return "\n".join("%s: %s" % (k, v) for k, v in headers.items())
+    return headers.get(name, "")
+
+
 def _status_ok(spec, status: int) -> bool:
     if spec is None:
         return True
@@ -129,11 +136,11 @@ def _match(cond: dict, status: int, headers: Dict[str, str],
         return False
 
     for name, needle in (cond.get("header_contains") or {}).items():
-        if needle not in headers.get(name, ""):
+        if needle not in _header_text(headers, name):
             return False
 
     for name, pattern in (cond.get("header_regex") or {}).items():
-        if not _safe_search(pattern, headers.get(name, "")):
+        if not _safe_search(pattern, _header_text(headers, name)):
             return False
 
     return True
@@ -150,21 +157,31 @@ def _probe_version(spec: Optional[dict], base: str, timeout: int,
     that path (many components expose the version on an endpoint that is
     not the one used for identification, e.g. Ollama's ``/api/version``).
     Otherwise the already-fetched response is reused.
+
+    ``spec`` may also be a list of such mappings: the first one that yields
+    a version wins (some products expose several equivalent endpoints).
     """
+    if isinstance(spec, (list, tuple)):
+        for item in spec:
+            version = _probe_version(item, base, timeout, headers, body)
+            if version:
+                return version
+        return ""
     if not isinstance(spec, dict):
         return ""
     if spec.get("path"):
         _, headers, body = _request(
             spec.get("method", "GET"), base + spec["path"], timeout=timeout,
-            headers=spec.get("headers"))
+            headers=spec.get("headers"), body=spec.get("body"))
 
     patterns = []
     if spec.get("body_regex"):
         patterns.append((spec["body_regex"], body))
     for name, pattern in (spec.get("header_regex") or {}).items():
-        patterns.append((pattern, headers.get(name, "")))
+        patterns.append((pattern, _header_text(headers, name)))
     if spec.get("header") and spec.get("value_regex"):
-        patterns.append((spec["value_regex"], headers.get(spec["header"], "")))
+        patterns.append((spec["value_regex"],
+                          _header_text(headers, spec["header"])))
 
     for pattern, text in patterns:
         m = _safe_search(pattern, text)
@@ -189,7 +206,7 @@ def fingerprint(target: str, timeout: int = 10,
             path = cond.get("path", "/")
             status, headers, body = _request(
                 cond.get("method", "GET"), base + path, timeout=timeout,
-                headers=cond.get("headers"))
+                headers=cond.get("headers"), body=cond.get("body"))
             if not _match(cond, status, headers, body):
                 continue
             detected.append({

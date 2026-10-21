@@ -88,9 +88,14 @@ def load_rules(kind: str) -> List[Dict]:
                 continue
             if not isinstance(data, dict) or "id" not in data:
                 continue
-            if data["id"] in seen:
+            # The same CVE can affect several products; keep one rule per
+            # (id, component) pair instead of dropping every copy after the
+            # first one.
+            key = (data["id"], data.get("component")) \
+                if kind == VULN_DIRNAME else data["id"]
+            if key in seen:
                 continue
-            seen.add(data["id"])
+            seen.add(key)
             data["_source"] = str(path)
             rules.append(data)
     return rules
@@ -115,8 +120,13 @@ def _check_regexes(patterns, where: str, errors: List[str]) -> None:
             errors.append("invalid regex in %s: %r (%s)" % (where, p, e))
 
 
-def validate_rule(kind: str, rule: Dict) -> List[str]:
-    """Return a list of schema problems (empty list == valid)."""
+def validate_rule(kind: str, rule: Dict,
+                  component_ids: Optional[set] = None) -> List[str]:
+    """Return a list of schema problems (empty list == valid).
+
+    *component_ids* lets callers that validate many rules reuse a single
+    fingerprint index instead of reloading every fingerprint per rule.
+    """
     errors: List[str] = []
     if not isinstance(rule, dict):
         return ["rule is not a mapping"]
@@ -149,8 +159,9 @@ def validate_rule(kind: str, rule: Dict) -> List[str]:
         if not rule.get("title"):
             errors.append("missing 'title'")
         comp = rule.get("component")
-        if not comp or comp not in {f.get("id")
-                                    for f in load_fingerprints()}:
+        if component_ids is None:
+            component_ids = {f.get("id") for f in load_fingerprints()}
+        if not comp or comp not in component_ids:
             errors.append(
                 "unknown component %r (see `aisec vuln list --kind fingerprints`)"
                 % comp)

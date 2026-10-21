@@ -111,10 +111,11 @@ def _handle_show(args):
 def _handle_validate():
     problems = 0
     total = 0
+    component_ids = {f.get("id") for f in load_fingerprints()}
     for kind in (FINGERPRINT_DIRNAME, VULN_DIRNAME):
         for r in load_rules(kind):
             total += 1
-            errs = validate_rule(kind, r)
+            errs = validate_rule(kind, r, component_ids)
             if errs:
                 problems += 1
                 print("[FAIL] %s (%s): %s" % (

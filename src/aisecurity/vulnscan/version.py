@@ -6,6 +6,7 @@ Rule files express affected ranges as compact strings, e.g.::
     affected: "*"                 # every version
     affected: ">=0.1.32,<0.1.46"  # AND of comparisons
     affected: ">=1.2,<=2.0"
+    affected: "<1.2||>=1.5,<2.0"  # OR of ranges (``||``)
 
 This module intentionally avoids extra dependencies (no ``packaging`` /
 ``semver``) so the toolkit stays installable with just PyYAML.
@@ -46,6 +47,9 @@ def version_in_range(version, spec) -> bool:
     if spec is None:
         return True
     spec = str(spec).strip()
+    if "||" in spec:
+        return any(version_in_range(version, part)
+                   for part in spec.split("||") if part.strip())
     if spec in ("", "*", "all", "any"):
         return True
 

@@ -258,6 +258,147 @@ class AutoScanner:
         return self.scan(case_ids, profile=profile_name,
                          transforms=transforms, languages=languages)
 
+    # ---------- 探针扫描 ----------
+    def scan_probes(self, probe_names: List[str],
+                    profile: str = "probes",
+                    transforms: List[str] = None,
+                    languages: List[str] = None) -> ScanResult:
+        """Run one or more attack probes (dynamic payload generators).
+
+        probe_names: list of probe names, or ['all'] for every probe.
+        """
+        from ..probes import list_probes, get_probe
+        from .expand import expand_payload, expand_matrix
+
+        if probe_names == ["all"]:
+            probe_names = list_probes()
+
+        self._interrupted = False
+        result = self._new_result(probe_names, profile)
+        result.meta["transforms"] = transforms or ["raw"]
+        result.meta["languages"] = languages or ["zh"]
+        result.meta["scan_type"] = "probes"
+
+        self.log.scan_start(
+            target=result.target, model=result.model,
+            profile=result.profile, total_cases=result.total_cases,
+        )
+
+        try:
+            for pname in probe_names:
+                if self._interrupted:
+                    self.log.warn("用户中断，停止后续探针")
+                    break
+
+                probe = get_probe(pname)
+                if probe is None:
+                    self.log.warn("未知探针，跳过: %s" % pname)
+                    continue
+
+                try:
+                    base_payloads = probe.generate()
+                except Exception as e:
+                    self.log.error("探针 %s 生成 payload 失败: %s" % (pname, e))
+                    result.errors += 1
+                    continue
+
+                if not base_payloads:
+                    self.log.warn("探针 %s 未生成任何 payload，跳过" % pname)
+                    continue
+
+                self.log.case_start("probe:%s" % pname, probe.description)
+
+                t0 = time.time()
+                case_hits = 0
+                case_errors = 0
+                case_payloads = 0
+
+                # Expand variants
+                all_variants = []
+                for bp in base_payloads:
+                    if languages and transforms:
+                        variants = expand_matrix(bp, transforms, languages, mark=True)
+                    elif transforms:
+                        variants = expand_payload(bp, transforms, mark=True)
+                    else:
+                        variants = expand_payload(bp, ["raw"], mark=True)
+                    all_variants.extend(variants)
+
+                total = len(all_variants)
+                self.log.info("[probe:%s] 扩展出 %d 条变体" % (pname, total))
+
+                for idx, variant in enumerate(all_variants, 1):
+                    if self._interrupted:
+                        break
+
+                    payload = variant["payload"]
+                    self.log.payload_start(idx, total)
+                    self.log.payload_sent(
+                        payload=payload,
+                        endpoint=getattr(self.target, "endpoint", ""),
+                        model=getattr(self.target, "model", ""),
+                    )
+
+                    try:
+                        resp = self.target.send(payload)
+                        evals = [ev.evaluate(payload, resp.text) for ev in self.evaluators]
+
+                        self.log.payload_response(
+                            response=resp.text,
+                            latency_ms=resp.latency_ms,
+                            tokens_in=getattr(resp, "tokens_in", 0),
+                            tokens_out=getattr(resp, "tokens_out", 0),
+                        )
+                        self.log.payload_evals(evals)
+
+                        cr = CaseResult(
+                            case_id="probe:%s" % pname,
+                            payload=payload,
+                            response_text=resp.text,
+                            eval_results=evals,
+                            latency_ms=resp.latency_ms,
+                            meta=variant,
+                        )
+                        if cr.success:
+                            case_hits += 1
+                            self.log.payload_result(success=True, error=False)
+                        else:
+                            self.log.payload_result(success=False, error=False)
+
+                    except Exception as e:
+                        err_msg = "%s: %s" % (type(e).__name__, e)
+                        self.log.payload_error(err_msg)
+                        self.log.payload_result(success=False, error=True)
+                        cr = CaseResult(case_id="probe:%s" % pname,
+                                        payload=payload,
+                                        error=err_msg, meta=variant)
+                        case_errors += 1
+
+                    result.results.append(cr)
+                    case_payloads += 1
+                    if self._sleep():
+                        break
+
+                elapsed = time.time() - t0
+                self.log.case_done("probe:%s" % pname, case_payloads,
+                                   case_hits, case_errors, elapsed)
+
+                result.total_payloads += case_payloads
+                result.hits += case_hits
+                result.errors += case_errors
+
+                if self.stop_on_error and case_errors > 0:
+                    break
+
+        except KeyboardInterrupt:
+            self.log.warn("用户中断（Ctrl+C），保存已有结果...")
+            self._interrupted = True
+
+        result.meta["interrupted"] = self._interrupted
+        result = self._finalize(result)
+        self.log.scan_done(result)
+        return result
+
     # ---------- 多轮扫描 ----------
     def scan_multi_turn(self, strategy_name: str,
                         case_id: str = "PI-002",

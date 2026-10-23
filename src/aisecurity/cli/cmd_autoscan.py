@@ -316,6 +316,17 @@ def _handle_run(args):
             result = scanner.scan_multi_turn(
                 args.multi_turn, case_id=case_id, max_turns=args.max_turns
             )
+        elif args.probes:
+            # Run attack probes instead of (or in addition to) YAML cases.
+            if args.probes.strip().lower() == "all":
+                probe_names = ["all"]
+            else:
+                probe_names = [n.strip() for n in args.probes.split(",") if n.strip()]
+            print("[autoscan] Running %d probe(s)..." % len(probe_names))
+            sys.stdout.flush()
+            result = scanner.scan_probes(
+                probe_names, transforms=transforms, languages=languages
+            )
         elif args.profile:
             result = scanner.scan_profile(
                 args.profile, transforms=transforms, languages=languages
